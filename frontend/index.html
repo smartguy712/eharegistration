@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Handball Association Eswatini – Registration System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0a2f5c;
+      --primary-light: #12447f;
+      --primary-dark: #061d3a;
+      --accent: #e0392c;
+      --accent-dark: #b8291f;
+      --gold: #f2b134;
+      --bg: #eef2f8;
+      --card: #ffffff;
+      --border: #e2e8f1;
+      --text: #1b2333;
+      --muted: #6b7688;
+      --success: #0a7a3e;
+      --success-bg: #e3f7ec;
+      --pending: #b36b00;
+      --pending-bg: #fff4dd;
+      --fail: #c0392b;
+      --fail-bg: #fdeaea;
+      --radius: 14px;
+      --shadow-sm: 0 1px 2px rgba(10,47,92,0.06), 0 1px 1px rgba(10,47,92,0.04);
+      --shadow-md: 0 10px 24px -8px rgba(10,47,92,0.18);
+      --shadow-lg: 0 20px 45px -12px rgba(10,47,92,0.28);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Manrope', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(1100px 500px at 100% -10%, rgba(224,57,44,0.08), transparent 60%),
+        radial-gradient(900px 500px at -10% 0%, rgba(10,47,92,0.06), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(120deg, var(--primary-dark) 0%, var(--primary) 55%, var(--primary-light) 100%);
+      color: white;
+      padding: 1.4rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--gold), var(--accent) 45%, var(--gold) 100%);
+      height: 4px;
+      top: auto;
+      bottom: 0;
+    }
+    header h1 {
+      font-family: 'Sora', 'Manrope', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    header h1::before {
+      content: '';
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 4px rgba(242,177,52,0.25);
+    }
+    header .badge {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      backdrop-filter: blur(4px);
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    nav {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      gap: 0.25rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    nav button {
+      background: none;
+      border: none;
+      padding: 1rem 1.15rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--muted);
+      border-bottom: 3px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      border-radius: 8px 8px 0 0;
+    }
+    nav button:hover { color: var(--primary); background: rgba(10,47,92,0.05); }
+    nav button.active {
+      color: var(--primary);
+      border-bottom-color: var(--accent);
+      font-weight: 700;
+    }
+    main { max-width: 1200px; margin: 1.75rem auto 3rem; padding: 0 1.5rem; }
+    .panel { display: none; animation: fadeIn 0.35s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.6rem;
+      margin-bottom: 1.4rem;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .card h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.05rem;
+      color: var(--primary);
+      margin-bottom: 1.1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--bg);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card h2::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      border-radius: 3px;
+      background: linear-gradient(180deg, var(--accent), var(--gold));
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { padding: 0.7rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th {
+      background: linear-gradient(180deg, #f4f7fb, #eef2f8);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    tbody tr { transition: background 0.15s ease; }
+    tr:hover td { background: #f6f9fd; }
+    .status {
+      display: inline-block;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .status.PAID, .status.SUCCESSFUL { background: var(--success-bg); color: var(--success); }
+    .status.PENDING { background: var(--pending-bg); color: var(--pending); }
+    .status.FAILED { background: var(--fail-bg); color: var(--fail); }
+    form { display: grid; gap: 0.85rem; }
+    label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+    input, select {
+      width: 100%;
+      padding: 0.65rem 0.8rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      background: #fbfcfe;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(10,47,92,0.1);
+    }
+    button.btn {
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+      color: white;
+      border: none;
+      padding: 0.75rem 1.3rem;
+      border-radius: 9px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      box-shadow: 0 4px 12px -4px rgba(10,47,92,0.5);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+    button.btn:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(10,47,92,0.55); }
+    button.btn:active { transform: translateY(0); }
+    button.btn-accent {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      box-shadow: 0 4px 12px -4px rgba(224,57,44,0.55);
+    }
+    button.btn-accent:hover { box-shadow: 0 6px 16px -4px rgba(224,57,44,0.6); }
+    button.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.78rem; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.6rem;
+    }
+    .stat {
+      background: linear-gradient(160deg, #ffffff, #f7f9fd);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.15rem 1.25rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stat:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .stat::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold), var(--accent));
+    }
+    .stat .value {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat .label { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; font-weight: 600; }
+    .msg {
+      padding: 0.8rem 1rem;
+      border-radius: 9px;
+      margin-bottom: 1rem;
+      font-size: 0.88rem;
+      font-weight: 500;
+      border-left: 4px solid transparent;
+    }
+    .msg.ok { background: var(--success-bg); color: var(--success); border-left-color: var(--success); }
+    .msg.err { background: var(--fail-bg); color: var(--fail); border-left-color: var(--fail); }
+    .msg.info { background: #e6f3fb; color: #0c5460; border-left-color: #0c8bb8; }
+    footer {
+      text-align: center;
+      padding: 1.75rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Handball Association Eswatini</h1>
+    <div class="badge">Season 2026 · SZL · v1.0.0</div>
+  </header>
+
+  <nav>
+    <button class="active" data-panel="dashboard">Dashboard</button>
+    <button data-panel="teams">Teams</button>
+    <button data-panel="players">Players</button>
+    <button data-panel="transfers">Transfers</button>
+    <button data-panel="payments">Payments</button>
+  </nav>
+
+  <main>
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="panel active">
+      <div class="stats" id="stats">
+        <div class="stat"><div class="value" id="stat-teams">–</div><div class="label">Teams Paid</div></div>
+        <div class="stat"><div class="value" id="stat-players">–</div><div class="label">Players Paid</div></div>
+        <div class="stat"><div class="value" id="stat-window">–</div><div class="label">Transfer Window</div></div>
+        <div class="stat"><div class="value">E150 / E50</div><div class="label">Team / Player Fee</div></div>
+      </div>
+      <div class="card">
+        <h2>System Status</h2>
+        <div id="health">Loading…</div>
+      </div>
+      <div class="card">
+        <h2>Fee Architecture Quick Reference</h2>
+        <table>
+          <thead>
+            <tr><th>Roster Metric</th><th>Players</th><th>Team Fee</th><th>Player Fees</th><th>Total</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Minimum Lineup</td><td>7</td><td>E150</td><td>E350</td><td>E500</td></tr>
+            <tr><td>Average Roster</td><td>10</td><td>E150</td><td>E500</td><td>E650</td></tr>
+            <tr><td>Standard Matchday</td><td>14</td><td>E150</td><td>E700</td><td>E850</td></tr>
+            <tr><td>Maximum Cap</td><td>16</td><td>E150</td><td>E800</td><td>E950</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TEAMS -->
+    <div id="teams" class="panel">
+      <div class="grid-2">
+        <div class="card">
+          <h2>Register New Team</h2>
+          <form id="team-form">
+            <div>
+              <label>Team Name *</label>
+              <input name="team_name" required placeholder="e.g. Mbabane Lions" />
+            </div>
+            <div>
+              <label>Manager Name *</label>
+              <input name="manager_name" required />
+            </div>
+            <div>
+              <label>Manager Phone (MoMo)</label>
+              <input name="manager_phone" placeholder="2687xxxxxxx" />
+            </div>
+            <div>
+              <label>Primary Jersey Color</label>
+              <input name="primary_jersey_color" />
+            </div>
+            <div>
+              <label>Secondary Jersey Color</label>
+              <input name="secondary_jersey_color" />
+            </div>
+            <button type="submit" class="btn">Create Team (E150 fee required)</button>
+          </form>
+          <div id="team-msg"></div>
+        </div>
+        <div class="card">
+          <h2>All Teams</h2>
+          <div id="teams-list">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAYERS -->
+    <div id="players" class="panel">
+      <div class="grid-2">
+        <div class="card">
+          <h2>Register Player</h2>
+          <form id="player-form">
+            <div>
+              <label>Legal Name *</label>
+              <input name="legal_name" required />
+            </div>
+            <div>
+              <label>Date of Birth *</label>
+              <input name="date_of_birth" type="date" required />
+            </div>
+            <div>
+              <label>Gender *</label>
+              <select name="gender" required>
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+              </select>
+            </div>
+            <div>
+              <label>Team *</label>
+              <select name="team_id" id="player-team-select" required>
+                <option value="">Select team</option>
+              </select>
+            </div>
+            <div>
+              <label>Preferred Position</label>
+              <select name="preferred_position">
+                <option value="">–</option>
+                <option>Goalkeeper</option>
+                <option>Pivot</option>
+                <option>Wing</option>
+                <option>Back</option>
+              </select>
+            </div>
+            <div>
+              <label>Dominant Hand</label>
+              <select name="dominant_hand">
+                <option value="">–</option>
+                <option>Left</option>
+                <option>Right</option>
+              </select>
+            </div>
+            <div>
+              <label>Emergency Contact Name</label>
+              <input name="emergency_contact_name" />
+            </div>
+            <div>
+              <label>Emergency Contact Phone</label>
+              <input name="emergency_contact_phone" />
+            </div>
+            <button type="submit" class="btn">Register Player (E50 fee required)</button>
+          </form>
+          <div id="player-msg"></div>
+        </div>
+        <div class="card">
+          <h2>Players (Current Season)</h2>
+          <div id="players-list">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSFERS -->
+    <div id="transfers" class="panel">
+      <div class="card">
+        <h2>Transfer Window Status</h2>
+        <div id="window-status">Loading…</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h2>Request Transfer</h2>
+          <form id="transfer-form">
+            <div>
+              <label>Player ID *</label>
+              <input name="player_id" type="number" required />
+            </div>
+            <div>
+              <label>To Team ID *</label>
+              <input name="to_team_id" type="number" required />
+            </div>
+            <button type="submit" class="btn">Submit Transfer Request</button>
+          </form>
+          <div id="transfer-msg"></div>
+        </div>
+        <div class="card">
+          <h2>Recent Transfers</h2>
+          <div id="transfers-list">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div id="payments" class="panel">
+      <div class="card">
+        <h2>Initiate MoMo Payment</h2>
+        <form id="pay-form">
+          <div>
+            <label>Amount (E)</label>
+            <input name="amount" type="number" step="0.01" value="50" required />
+          </div>
+          <div>
+            <label>Phone Number (MSISDN)</label>
+            <input name="phoneNumber" placeholder="2687xxxxxxx" required />
+          </div>
+          <div>
+            <label>Payment Type</label>
+            <select name="paymentType" required>
+              <option value="PLAYER_AFFILIATION">Player Affiliation (E50)</option>
+              <option value="TEAM_AFFILIATION">Team Affiliation (E150)</option>
+              <option value="TRANSFER_FEE">Transfer Fee (E50)</option>
+            </select>
+          </div>
+          <div>
+            <label>Related Team ID (optional)</label>
+            <input name="teamId" type="number" />
+          </div>
+          <div>
+            <label>Related Player ID (optional)</label>
+            <input name="playerId" type="number" />
+          </div>
+          <button type="submit" class="btn">Request Payment (USSD Push)</button>
+        </form>
+        <div id="pay-msg"></div>
+      </div>
+      <div class="card">
+        <h2>Simulate Sandbox Success</h2>
+        <p style="font-size:0.85rem;color:#666;margin-bottom:0.75rem;">
+          After requesting a payment in sandbox mode, paste the systemReference here to mark it successful and activate the roster.
+        </p>
+        <form id="sim-form">
+          <input name="systemReference" placeholder="HAE-TX-…" required style="width:100%;margin-bottom:0.5rem;" />
+          <button type="submit" class="btn btn-accent">Mark Successful</button>
+        </form>
+        <div id="sim-msg"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Handball Association Eswatini · Registration & Management System v1.0.0 · Hybrid Local + Cloud
+  </footer>
+
+  <script>
+    const API = '';
+
+    // Navigation
+    document.querySelectorAll('nav button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.panel).classList.add('active');
+      });
+    });
+
+    function msg(el, text, type = 'ok') {
+      el.innerHTML = `<div class="msg ${type}">${text}</div>`;
+    }
+
+    // Dashboard
+    async function loadDashboard() {
+      try {
+        const h = await fetch('/api/health').then(r => r.json());
+        document.getElementById('health').innerHTML = `
+          <p><strong>Status:</strong> ${h.status} · <strong>Env:</strong> ${h.environment} · <strong>Season:</strong> ${h.season}</p>
+          <p style="font-size:0.85rem;color:#666;">${h.timestamp}</p>
+        `;
+      } catch (e) {
+        document.getElementById('health').innerHTML = '<div class="msg err">Backend unreachable. Is the server running?</div>';
+      }
+
+      try {
+        const f = await fetch('/api/finance/summary').then(r => r.json());
+        document.getElementById('stat-teams').textContent = f.teamsPaid ?? '–';
+        document.getElementById('stat-players').textContent = f.playersPaid ?? '–';
+      } catch {}
+
+      try {
+        const w = await fetch('/api/transfers/window-status').then(r => r.json());
+        document.getElementById('stat-window').textContent = w.currentWindow || 'Closed';
+      } catch {}
+    }
+
+    // Teams
+    async function loadTeams() {
+      const res = await fetch('/api/teams').then(r => r.json());
+      const list = document.getElementById('teams-list');
+      const select = document.getElementById('player-team-select');
+      if (!res.success) {
+        list.innerHTML = '<div class="msg err">Failed to load teams</div>';
+        return;
+      }
+      if (res.teams.length === 0) {
+        list.innerHTML = '<p style="color:#888;">No teams registered yet.</p>';
+        return;
+      }
+      list.innerHTML = `<table>
+        <thead><tr><th>ID</th><th>Name</th><th>Manager</th><th>Players</th><th>Fee</th></tr></thead>
+        <tbody>
+          ${res.teams.map(t => `
+            <tr>
+              <td>${t.team_id}</td>
+              <td><strong>${t.team_name}</strong></td>
+              <td>${t.manager_name}</td>
+              <td>${t.active_players || 0}</td>
+              <td><span class="status ${t.team_fee_status}">${t.team_fee_status}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+
+      select.innerHTML = '<option value="">Select team</option>' +
+        res.teams.map(t => `<option value="${t.team_id}">${t.team_name}</option>`).join('');
+    }
+
+    document.getElementById('team-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const body = Object.fromEntries(fd);
+      const res = await fetch('/api/teams', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }).then(r => r.json());
+      msg(document.getElementById('team-msg'), res.success ? res.message : res.error, res.success ? 'ok' : 'err');
+      if (res.success) {
+        e.target.reset();
+        loadTeams();
+      }
+    });
+
+    // Players
+    async function loadPlayers() {
+      const res = await fetch('/api/players').then(r => r.json());
+      const list = document.getElementById('players-list');
+      if (!res.success) {
+        list.innerHTML = '<div class="msg err">Failed to load players</div>';
+        return;
+      }
+      if (res.players.length === 0) {
+        list.innerHTML = '<p style="color:#888;">No players registered yet.</p>';
+        return;
+      }
+      list.innerHTML = `<table>
+        <thead><tr><th>ID</th><th>Name</th><th>License</th><th>Team</th><th>Pos</th><th>Fee</th></tr></thead>
+        <tbody>
+          ${res.players.map(p => `
+            <tr>
+              <td>${p.player_id}</td>
+              <td>${p.legal_name}</td>
+              <td style="font-size:0.8rem;">${p.global_license_number || '–'}</td>
+              <td>${p.team_name || '–'}</td>
+              <td>${p.preferred_position || '–'}</td>
+              <td><span class="status ${p.player_fee_status || 'PENDING'}">${p.player_fee_status || '–'}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+    }
+
+    document.getElementById('player-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const body = Object.fromEntries(fd);
+      body.team_id = parseInt(body.team_id, 10);
+      const res = await fetch('/api/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }).then(r => r.json());
+      msg(document.getElementById('player-msg'), res.success ? res.message : res.error, res.success ? 'ok' : 'err');
+      if (res.success) {
+        e.target.reset();
+        loadPlayers();
+      }
+    });
+
+    // Transfers
+    async function loadTransfers() {
+      const w = await fetch('/api/transfers/window-status').then(r => r.json());
+      document.getElementById('window-status').innerHTML = `
+        <div class="msg ${w.currentWindow ? 'ok' : 'info'}">${w.message}</div>
+      `;
+
+      const res = await fetch('/api/transfers').then(r => r.json());
+      const list = document.getElementById('transfers-list');
+      if (!res.success || res.transfers.length === 0) {
+        list.innerHTML = '<p style="color:#888;">No transfers yet.</p>';
+        return;
+      }
+      list.innerHTML = `<table>
+        <thead><tr><th>ID</th><th>Player</th><th>From → To</th><th>Window</th><th>Admin</th></tr></thead>
+        <tbody>
+          ${res.transfers.map(t => `
+            <tr>
+              <td>${t.transfer_id}</td>
+              <td>${t.player_name}</td>
+              <td>${t.from_team || '?'} → ${t.to_team || '?'}</td>
+              <td>${t.window_type}</td>
+              <td>${t.approved_by_admin ? '✓' : 'Pending'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+    }
+
+    document.getElementById('transfer-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const body = {
+        player_id: parseInt(fd.get('player_id'), 10),
+        to_team_id: parseInt(fd.get('to_team_id'), 10),
+      };
+      const res = await fetch('/api/transfers/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }).then(r => r.json());
+      msg(document.getElementById('transfer-msg'), res.success ? res.message : res.error, res.success ? 'ok' : 'err');
+      if (res.success) {
+        e.target.reset();
+        loadTransfers();
+      }
+    });
+
+    // Payments
+    document.getElementById('pay-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const body = {
+        amount: parseFloat(fd.get('amount')),
+        phoneNumber: fd.get('phoneNumber'),
+        paymentType: fd.get('paymentType'),
+        teamId: fd.get('teamId') ? parseInt(fd.get('teamId'), 10) : undefined,
+        playerId: fd.get('playerId') ? parseInt(fd.get('playerId'), 10) : undefined,
+      };
+      const res = await fetch('/api/payments/request-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }).then(r => r.json());
+      msg(document.getElementById('pay-msg'),
+        res.success
+          ? `${res.message}<br><strong>Reference:</strong> ${res.systemReference}`
+          : res.error,
+        res.success ? 'ok' : 'err');
+    });
+
+    document.getElementById('sim-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const res = await fetch('/api/payments/simulate-success', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ systemReference: fd.get('systemReference') }),
+      }).then(r => r.json());
+      msg(document.getElementById('sim-msg'), res.success ? res.message : res.error, res.success ? 'ok' : 'err');
+      if (res.success) {
+        loadDashboard();
+        loadTeams();
+        loadPlayers();
+      }
+    });
+
+    // Init
+    loadDashboard();
+    loadTeams();
+    loadPlayers();
+    loadTransfers();
+  </script>
+</body>
+</html>
