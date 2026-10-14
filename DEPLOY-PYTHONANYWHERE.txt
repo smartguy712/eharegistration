@@ -1,0 +1,135 @@
+Deploy EHA Registration to PythonAnywhere
+=========================================
+
+Works on the free plan (Flask + SQLite).
+
+------------------------------------------------
+1) Create account
+------------------------------------------------
+https://www.pythonanywhere.com  → Sign up (Beginner/free is fine)
+
+------------------------------------------------
+2) Upload project
+------------------------------------------------
+Option A – Files tab
+  • Open the Files tab
+  • Go to /home/YOUR_USERNAME/
+  • Upload handball-sqlite-roles.zip (or upload files one by one)
+  • Open a Bash console and run:
+
+      cd ~
+      unzip -o handball-sqlite-roles.zip
+      # if zip contains a folder named handball-sqlite:
+      ls handball-sqlite
+
+Option B – Git (if you push the folder to GitHub)
+      cd ~
+      git clone YOUR_REPO_URL handball-sqlite
+
+Final layout should look like:
+  /home/YOUR_USERNAME/handball-sqlite/demo_server.py
+  /home/YOUR_USERNAME/handball-sqlite/static/eha-logo.jpg
+  /home/YOUR_USERNAME/handball-sqlite/requirements.txt
+  /home/YOUR_USERNAME/handball-sqlite/wsgi.py
+
+------------------------------------------------
+3) Install packages (Bash console)
+------------------------------------------------
+  cd ~/handball-sqlite
+  pip3.10 install --user flask reportlab
+  # Use the same Python version as your web app (3.10 is common on PA).
+  # Check:  python3 --version
+
+------------------------------------------------
+4) Create a Web app
+------------------------------------------------
+  • Go to Web tab → Add a new web app
+  • Choose Manual configuration (not “Flask” wizard – we already have the app)
+  • Python version: 3.10 (or matching pip version)
+  • Click through until the app is created
+
+------------------------------------------------
+5) Configure WSGI file
+------------------------------------------------
+  Web tab → WSGI configuration file (link near top)
+
+  Delete the default content and paste ONE of these:
+
+  --- Option A (uses wsgi.py) ---
+  import sys
+  path = '/home/YOUR_USERNAME/handball-sqlite'
+  if path not in sys.path:
+      sys.path.insert(0, path)
+  from wsgi import application
+
+  --- Option B (direct) ---
+  import sys
+  path = '/home/YOUR_USERNAME/handball-sqlite'
+  if path not in sys.path:
+      sys.path.insert(0, path)
+  from demo_server import app as application
+
+  Replace YOUR_USERNAME with your real PythonAnywhere username.
+  Save the file.
+
+------------------------------------------------
+6) Static files (logo + uploads)
+------------------------------------------------
+  Web tab → Static files
+
+  URL:  /static/
+  Directory:  /home/YOUR_USERNAME/handball-sqlite/static/
+
+  Save, then Reload the web app.
+
+  (The app also serves /static/ itself; the mapping above is faster and preferred.)
+
+------------------------------------------------
+7) Working directory (recommended)
+------------------------------------------------
+  Web tab → Code → Working directory
+  Set to:  /home/YOUR_USERNAME/handball-sqlite
+
+------------------------------------------------
+8) Reload
+------------------------------------------------
+  Web tab → green Reload button
+
+  Open:  https://YOUR_USERNAME.pythonanywhere.com
+
+------------------------------------------------
+9) First login
+------------------------------------------------
+  Default seed accounts (only on first empty database):
+    admin / admin123
+    officer / officer123
+    coach_lions / coach123
+
+  Change passwords after first login.
+
+------------------------------------------------
+10) Optional security
+------------------------------------------------
+  Web → Environment variables (or in WSGI before import):
+    EHA_SECRET_KEY = a-long-random-string
+
+  Or in WSGI file before importing the app:
+    import os
+    os.environ["EHA_SECRET_KEY"] = "put-a-long-random-secret-here"
+
+------------------------------------------------
+Troubleshooting
+------------------------------------------------
+• Error log: Web tab → Log files → Error log
+• ImportError flask: pip3.10 install --user flask reportlab
+• 404 on logo: check Static files mapping for /static/
+• Database path: handball.db is created next to demo_server.py
+• Free plan sleeps: first request after idle can be slow
+• Real Mobile Money / EFT APIs: not wired; sandbox records payments in-app
+• Cannot run app.run() on PA for public site – always use WSGI + Reload
+
+------------------------------------------------
+Local vs online
+------------------------------------------------
+Local Windows: start-demo.bat still works.
+PythonAnywhere: never need start-demo.bat; use Web Reload only.
